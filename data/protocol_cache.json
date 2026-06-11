@@ -1,0 +1,460 @@
+{
+  "cardiac_arrest": {
+    "critical": {
+      "code": "PRT-2024-001",
+      "title": "Protocolo PCR — Parada Cardiorrespiratoria",
+      "steps": [
+        "Confirmar inconsciencia y ausencia de respiración / pulso.",
+        "Activar código parada: enviar SVA + SVB.",
+        "Iniciar RCP inmediatamente: 30 compresiones + 2 ventilaciones.",
+        "Desfibrilación precoz si DEA disponible (< 3 min).",
+        "Tiempo objetivo: primera unidad en escena < 8 min.",
+        "Notificar hospital receptor con pre-aviso código 90.",
+        "Continuar hasta ROSC, relevo o decisión médica."
+      ],
+      "escalation": "Si > 3 víctimas simultáneas: activar PEM. Refuerzo 2 SVB adicionales.",
+      "notes": "Menores de 1 año: protocolo pediátrico. Compresiones con 2 dedos, ratio 15:2.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753357+00:00"
+    },
+    "high": {
+      "code": "PRT-2024-001",
+      "title": "Protocolo PCR — Parada Cardiorrespiratoria",
+      "steps": [
+        "Confirmar inconsciencia y ausencia de respiración / pulso.",
+        "Activar código parada: enviar SVA + SVB.",
+        "Iniciar RCP inmediatamente: 30 compresiones + 2 ventilaciones.",
+        "Desfibrilación precoz si DEA disponible (< 3 min).",
+        "Tiempo objetivo: primera unidad en escena < 8 min.",
+        "Notificar hospital receptor con pre-aviso código 90.",
+        "Continuar hasta ROSC, relevo o decisión médica."
+      ],
+      "escalation": "Si > 3 víctimas simultáneas: activar PEM. Refuerzo 2 SVB adicionales.",
+      "notes": "Menores de 1 año: protocolo pediátrico. Compresiones con 2 dedos, ratio 15:2.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753370+00:00"
+    },
+    "medium": {
+      "code": "PRT-2024-001",
+      "title": "Protocolo PCR — Parada Cardiorrespiratoria",
+      "steps": [
+        "Confirmar inconsciencia y ausencia de respiración / pulso.",
+        "Activar código parada: enviar SVA + SVB.",
+        "Iniciar RCP inmediatamente: 30 compresiones + 2 ventilaciones.",
+        "Desfibrilación precoz si DEA disponible (< 3 min).",
+        "Tiempo objetivo: primera unidad en escena < 8 min.",
+        "Notificar hospital receptor con pre-aviso código 90.",
+        "Continuar hasta ROSC, relevo o decisión médica."
+      ],
+      "escalation": "Si > 3 víctimas simultáneas: activar PEM. Refuerzo 2 SVB adicionales.",
+      "notes": "Menores de 1 año: protocolo pediátrico. Compresiones con 2 dedos, ratio 15:2.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753374+00:00"
+    },
+    "low": {
+      "code": "PRT-2024-001",
+      "title": "Protocolo PCR — Parada Cardiorrespiratoria",
+      "steps": [
+        "Confirmar inconsciencia y ausencia de respiración / pulso.",
+        "Activar código parada: enviar SVA + SVB.",
+        "Iniciar RCP inmediatamente: 30 compresiones + 2 ventilaciones.",
+        "Desfibrilación precoz si DEA disponible (< 3 min).",
+        "Tiempo objetivo: primera unidad en escena < 8 min.",
+        "Notificar hospital receptor con pre-aviso código 90.",
+        "Continuar hasta ROSC, relevo o decisión médica."
+      ],
+      "escalation": "Si > 3 víctimas simultáneas: activar PEM. Refuerzo 2 SVB adicionales.",
+      "notes": "Menores de 1 año: protocolo pediátrico. Compresiones con 2 dedos, ratio 15:2.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753376+00:00"
+    }
+  },
+  "traffic_accident": {
+    "critical": {
+      "code": "PRT-2024-015",
+      "title": "Protocolo ATT — Accidente de Tráfico con Víctimas",
+      "steps": [
+        "Asegurar escena: señalización a 100m en ambas direcciones.",
+        "Evaluar número de vehículos y víctimas antes de acercarse.",
+        "Triaje START: Rojo / Amarillo / Verde / Negro.",
+        "Enviar SVA + SVB (trauma) + unidad policial.",
+        "Si atrapados: bomberos con equipo de rescate (GREA).",
+        "No mover con sospecha de lesión medular.",
+        "PMA si > 3 víctimas. Notificar hospital receptor."
+      ],
+      "escalation": "Si > 5 víctimas: PEM y coordinador sanitario.",
+      "notes": "En autopistas: perímetro mínimo 200m.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753378+00:00"
+    },
+    "high": {
+      "code": "PRT-2024-015",
+      "title": "Protocolo ATT — Accidente de Tráfico con Víctimas",
+      "steps": [
+        "Asegurar escena: señalización a 100m en ambas direcciones.",
+        "Evaluar número de vehículos y víctimas antes de acercarse.",
+        "Triaje START: Rojo / Amarillo / Verde / Negro.",
+        "Enviar SVA + SVB (trauma) + unidad policial.",
+        "Si atrapados: bomberos con equipo de rescate (GREA).",
+        "No mover con sospecha de lesión medular.",
+        "PMA si > 3 víctimas. Notificar hospital receptor."
+      ],
+      "escalation": "Si > 5 víctimas: PEM y coordinador sanitario.",
+      "notes": "En autopistas: perímetro mínimo 200m.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753380+00:00"
+    },
+    "medium": {
+      "code": "PRT-2024-015",
+      "title": "Protocolo ATT — Accidente de Tráfico con Víctimas",
+      "steps": [
+        "Asegurar escena: señalización a 100m en ambas direcciones.",
+        "Evaluar número de vehículos y víctimas antes de acercarse.",
+        "Triaje START: Rojo / Amarillo / Verde / Negro.",
+        "Enviar SVA + SVB (trauma) + unidad policial.",
+        "Si atrapados: bomberos con equipo de rescate (GREA).",
+        "No mover con sospecha de lesión medular.",
+        "PMA si > 3 víctimas. Notificar hospital receptor."
+      ],
+      "escalation": "Si > 5 víctimas: PEM y coordinador sanitario.",
+      "notes": "En autopistas: perímetro mínimo 200m.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753382+00:00"
+    },
+    "low": {
+      "code": "PRT-2024-015",
+      "title": "Protocolo ATT — Accidente de Tráfico con Víctimas",
+      "steps": [
+        "Asegurar escena: señalización a 100m en ambas direcciones.",
+        "Evaluar número de vehículos y víctimas antes de acercarse.",
+        "Triaje START: Rojo / Amarillo / Verde / Negro.",
+        "Enviar SVA + SVB (trauma) + unidad policial.",
+        "Si atrapados: bomberos con equipo de rescate (GREA).",
+        "No mover con sospecha de lesión medular.",
+        "PMA si > 3 víctimas. Notificar hospital receptor."
+      ],
+      "escalation": "Si > 5 víctimas: PEM y coordinador sanitario.",
+      "notes": "En autopistas: perímetro mínimo 200m.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753383+00:00"
+    }
+  },
+  "fire": {
+    "critical": {
+      "code": "PRT-2024-008",
+      "title": "Protocolo INC — Incendio Estructural",
+      "steps": [
+        "Confirmar dirección exacta y plantas afectadas.",
+        "Enviar: 2 bomberos + SVA + unidad policial.",
+        "Cortar suministros de gas y electricidad.",
+        "Evacuación inmediata. Punto de encuentro a 200m.",
+        "Si atrapados: activar GREA.",
+        "Perímetro de seguridad 100m. Cortar tráfico."
+      ],
+      "escalation": "Si afecta > 3 plantas o explosiones: 2 unidades adicionales.",
+      "notes": "Edificios con MATPEL: protocolo específico. Notificar SEPRONA.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753385+00:00"
+    },
+    "high": {
+      "code": "PRT-2024-008",
+      "title": "Protocolo INC — Incendio Estructural",
+      "steps": [
+        "Confirmar dirección exacta y plantas afectadas.",
+        "Enviar: 2 bomberos + SVA + unidad policial.",
+        "Cortar suministros de gas y electricidad.",
+        "Evacuación inmediata. Punto de encuentro a 200m.",
+        "Si atrapados: activar GREA.",
+        "Perímetro de seguridad 100m. Cortar tráfico."
+      ],
+      "escalation": "Si afecta > 3 plantas o explosiones: 2 unidades adicionales.",
+      "notes": "Edificios con MATPEL: protocolo específico. Notificar SEPRONA.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753387+00:00"
+    },
+    "medium": {
+      "code": "PRT-2024-008",
+      "title": "Protocolo INC — Incendio Estructural",
+      "steps": [
+        "Confirmar dirección exacta y plantas afectadas.",
+        "Enviar: 2 bomberos + SVA + unidad policial.",
+        "Cortar suministros de gas y electricidad.",
+        "Evacuación inmediata. Punto de encuentro a 200m.",
+        "Si atrapados: activar GREA.",
+        "Perímetro de seguridad 100m. Cortar tráfico."
+      ],
+      "escalation": "Si afecta > 3 plantas o explosiones: 2 unidades adicionales.",
+      "notes": "Edificios con MATPEL: protocolo específico. Notificar SEPRONA.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753388+00:00"
+    },
+    "low": {
+      "code": "PRT-2024-008",
+      "title": "Protocolo INC — Incendio Estructural",
+      "steps": [
+        "Confirmar dirección exacta y plantas afectadas.",
+        "Enviar: 2 bomberos + SVA + unidad policial.",
+        "Cortar suministros de gas y electricidad.",
+        "Evacuación inmediata. Punto de encuentro a 200m.",
+        "Si atrapados: activar GREA.",
+        "Perímetro de seguridad 100m. Cortar tráfico."
+      ],
+      "escalation": "Si afecta > 3 plantas o explosiones: 2 unidades adicionales.",
+      "notes": "Edificios con MATPEL: protocolo específico. Notificar SEPRONA.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753390+00:00"
+    }
+  },
+  "stroke": {
+    "critical": {
+      "code": "PRT-2024-019",
+      "title": "Protocolo ICTUS — Código Ictus",
+      "steps": [
+        "Activar código ictus. Confirmar tiempo de inicio de síntomas.",
+        "Enviar SVA con médico neurólogo de guardia en alerta.",
+        "Evaluación NIHSS en campo si el equipo está entrenado.",
+        "Notificar hospital receptor (código ictus). Cath lab en espera.",
+        "Traslado inmediato. Tiempo objetivo puerta-aguja < 60 min."
+      ],
+      "escalation": "Si síntomas > 4.5h o anticoagulado: evaluar contraindicaciones para trombólisis.",
+      "notes": "Escala FAST: Face, Arms, Speech, Time.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753392+00:00"
+    },
+    "high": {
+      "code": "PRT-2024-019",
+      "title": "Protocolo ICTUS — Código Ictus",
+      "steps": [
+        "Activar código ictus. Confirmar tiempo de inicio de síntomas.",
+        "Enviar SVA con médico neurólogo de guardia en alerta.",
+        "Evaluación NIHSS en campo si el equipo está entrenado.",
+        "Notificar hospital receptor (código ictus). Cath lab en espera.",
+        "Traslado inmediato. Tiempo objetivo puerta-aguja < 60 min."
+      ],
+      "escalation": "Si síntomas > 4.5h o anticoagulado: evaluar contraindicaciones para trombólisis.",
+      "notes": "Escala FAST: Face, Arms, Speech, Time.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753394+00:00"
+    },
+    "medium": {
+      "code": "PRT-2024-019",
+      "title": "Protocolo ICTUS — Código Ictus",
+      "steps": [
+        "Activar código ictus. Confirmar tiempo de inicio de síntomas.",
+        "Enviar SVA con médico neurólogo de guardia en alerta.",
+        "Evaluación NIHSS en campo si el equipo está entrenado.",
+        "Notificar hospital receptor (código ictus). Cath lab en espera.",
+        "Traslado inmediato. Tiempo objetivo puerta-aguja < 60 min."
+      ],
+      "escalation": "Si síntomas > 4.5h o anticoagulado: evaluar contraindicaciones para trombólisis.",
+      "notes": "Escala FAST: Face, Arms, Speech, Time.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753395+00:00"
+    },
+    "low": {
+      "code": "PRT-2024-019",
+      "title": "Protocolo ICTUS — Código Ictus",
+      "steps": [
+        "Activar código ictus. Confirmar tiempo de inicio de síntomas.",
+        "Enviar SVA con médico neurólogo de guardia en alerta.",
+        "Evaluación NIHSS en campo si el equipo está entrenado.",
+        "Notificar hospital receptor (código ictus). Cath lab en espera.",
+        "Traslado inmediato. Tiempo objetivo puerta-aguja < 60 min."
+      ],
+      "escalation": "Si síntomas > 4.5h o anticoagulado: evaluar contraindicaciones para trombólisis.",
+      "notes": "Escala FAST: Face, Arms, Speech, Time.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753397+00:00"
+    }
+  },
+  "gas_leak": {
+    "critical": {
+      "code": "PRT-2024-022",
+      "title": "Protocolo GAS — Fuga de Gas Natural / GLP",
+      "steps": [
+        "NO activar ni apagar interruptores eléctricos.",
+        "Evacuar inmediatamente el recinto.",
+        "Ventilar abriendo puertas y ventanas al salir.",
+        "Cortar suministro desde la llave exterior.",
+        "Solicitar técnico de la compañía distribuidora.",
+        "Inspeccionar con detector portátil antes de reentrar."
+      ],
+      "escalation": "Con víctimas por inhalación o explosión: activar INC simultáneamente.",
+      "notes": "GLP más pesado que el aire: acumula en zonas bajas.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753399+00:00"
+    },
+    "high": {
+      "code": "PRT-2024-022",
+      "title": "Protocolo GAS — Fuga de Gas Natural / GLP",
+      "steps": [
+        "NO activar ni apagar interruptores eléctricos.",
+        "Evacuar inmediatamente el recinto.",
+        "Ventilar abriendo puertas y ventanas al salir.",
+        "Cortar suministro desde la llave exterior.",
+        "Solicitar técnico de la compañía distribuidora.",
+        "Inspeccionar con detector portátil antes de reentrar."
+      ],
+      "escalation": "Con víctimas por inhalación o explosión: activar INC simultáneamente.",
+      "notes": "GLP más pesado que el aire: acumula en zonas bajas.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753400+00:00"
+    },
+    "medium": {
+      "code": "PRT-2024-022",
+      "title": "Protocolo GAS — Fuga de Gas Natural / GLP",
+      "steps": [
+        "NO activar ni apagar interruptores eléctricos.",
+        "Evacuar inmediatamente el recinto.",
+        "Ventilar abriendo puertas y ventanas al salir.",
+        "Cortar suministro desde la llave exterior.",
+        "Solicitar técnico de la compañía distribuidora.",
+        "Inspeccionar con detector portátil antes de reentrar."
+      ],
+      "escalation": "Con víctimas por inhalación o explosión: activar INC simultáneamente.",
+      "notes": "GLP más pesado que el aire: acumula en zonas bajas.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753402+00:00"
+    },
+    "low": {
+      "code": "PRT-2024-022",
+      "title": "Protocolo GAS — Fuga de Gas Natural / GLP",
+      "steps": [
+        "NO activar ni apagar interruptores eléctricos.",
+        "Evacuar inmediatamente el recinto.",
+        "Ventilar abriendo puertas y ventanas al salir.",
+        "Cortar suministro desde la llave exterior.",
+        "Solicitar técnico de la compañía distribuidora.",
+        "Inspeccionar con detector portátil antes de reentrar."
+      ],
+      "escalation": "Con víctimas por inhalación o explosión: activar INC simultáneamente.",
+      "notes": "GLP más pesado que el aire: acumula en zonas bajas.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753404+00:00"
+    }
+  },
+  "assault": {
+    "critical": {
+      "code": "PRT-2024-031",
+      "title": "Protocolo AGR — Agresión y Violencia",
+      "steps": [
+        "Esperar autorización policial antes de la entrada sanitaria.",
+        "Evaluar número de víctimas y lesiones.",
+        "Separar testigos y agresor de las víctimas.",
+        "Atención sanitaria con seguridad garantizada.",
+        "Preservar indicios para instrucción judicial."
+      ],
+      "escalation": "Si hay armas: solicitar GEOS. Mantener perímetro.",
+      "notes": "Violencia de género: activar protocolo VIOGEN.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753405+00:00"
+    },
+    "high": {
+      "code": "PRT-2024-031",
+      "title": "Protocolo AGR — Agresión y Violencia",
+      "steps": [
+        "Esperar autorización policial antes de la entrada sanitaria.",
+        "Evaluar número de víctimas y lesiones.",
+        "Separar testigos y agresor de las víctimas.",
+        "Atención sanitaria con seguridad garantizada.",
+        "Preservar indicios para instrucción judicial."
+      ],
+      "escalation": "Si hay armas: solicitar GEOS. Mantener perímetro.",
+      "notes": "Violencia de género: activar protocolo VIOGEN.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753407+00:00"
+    },
+    "medium": {
+      "code": "PRT-2024-031",
+      "title": "Protocolo AGR — Agresión y Violencia",
+      "steps": [
+        "Esperar autorización policial antes de la entrada sanitaria.",
+        "Evaluar número de víctimas y lesiones.",
+        "Separar testigos y agresor de las víctimas.",
+        "Atención sanitaria con seguridad garantizada.",
+        "Preservar indicios para instrucción judicial."
+      ],
+      "escalation": "Si hay armas: solicitar GEOS. Mantener perímetro.",
+      "notes": "Violencia de género: activar protocolo VIOGEN.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753411+00:00"
+    },
+    "low": {
+      "code": "PRT-2024-031",
+      "title": "Protocolo AGR — Agresión y Violencia",
+      "steps": [
+        "Esperar autorización policial antes de la entrada sanitaria.",
+        "Evaluar número de víctimas y lesiones.",
+        "Separar testigos y agresor de las víctimas.",
+        "Atención sanitaria con seguridad garantizada.",
+        "Preservar indicios para instrucción judicial."
+      ],
+      "escalation": "Si hay armas: solicitar GEOS. Mantener perímetro.",
+      "notes": "Violencia de género: activar protocolo VIOGEN.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753412+00:00"
+    }
+  },
+  "fall_injury": {
+    "critical": {
+      "code": "PRT-2024-011",
+      "title": "Protocolo TRA — Traumatismo por Caída",
+      "steps": [
+        "Estabilizar columna cervical si el mecanismo lo indica.",
+        "Evaluar nivel de consciencia (Glasgow).",
+        "Inmovilizar fracturas visibles antes del traslado.",
+        "Control de hemorragias con compresión directa.",
+        "Traslado al hospital de referencia con pre-aviso."
+      ],
+      "escalation": "Si TCE moderado-severo (Glasgow < 13): activar código trauma.",
+      "notes": "Personas mayores: alta sospecha de fractura de cadera.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753414+00:00"
+    },
+    "high": {
+      "code": "PRT-2024-011",
+      "title": "Protocolo TRA — Traumatismo por Caída",
+      "steps": [
+        "Estabilizar columna cervical si el mecanismo lo indica.",
+        "Evaluar nivel de consciencia (Glasgow).",
+        "Inmovilizar fracturas visibles antes del traslado.",
+        "Control de hemorragias con compresión directa.",
+        "Traslado al hospital de referencia con pre-aviso."
+      ],
+      "escalation": "Si TCE moderado-severo (Glasgow < 13): activar código trauma.",
+      "notes": "Personas mayores: alta sospecha de fractura de cadera.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753416+00:00"
+    },
+    "medium": {
+      "code": "PRT-2024-011",
+      "title": "Protocolo TRA — Traumatismo por Caída",
+      "steps": [
+        "Estabilizar columna cervical si el mecanismo lo indica.",
+        "Evaluar nivel de consciencia (Glasgow).",
+        "Inmovilizar fracturas visibles antes del traslado.",
+        "Control de hemorragias con compresión directa.",
+        "Traslado al hospital de referencia con pre-aviso."
+      ],
+      "escalation": "Si TCE moderado-severo (Glasgow < 13): activar código trauma.",
+      "notes": "Personas mayores: alta sospecha de fractura de cadera.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753417+00:00"
+    },
+    "low": {
+      "code": "PRT-2024-011",
+      "title": "Protocolo TRA — Traumatismo por Caída",
+      "steps": [
+        "Estabilizar columna cervical si el mecanismo lo indica.",
+        "Evaluar nivel de consciencia (Glasgow).",
+        "Inmovilizar fracturas visibles antes del traslado.",
+        "Control de hemorragias con compresión directa.",
+        "Traslado al hospital de referencia con pre-aviso."
+      ],
+      "escalation": "Si TCE moderado-severo (Glasgow < 13): activar código trauma.",
+      "notes": "Personas mayores: alta sospecha de fractura de cadera.",
+      "source": "stub",
+      "indexed_at": "2026-05-24T10:49:53.753419+00:00"
+    }
+  }
+}
