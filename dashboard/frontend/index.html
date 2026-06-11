@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IMERS — Inteligencia Multiagente para Emergencias y Respuesta Sanitaria</title>
+
+  <!-- Leaflet map (CDN) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Apply stored theme + toggle state before first paint to avoid flash -->
+  <script>
+    try {
+      if (localStorage.getItem('imers-theme') === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        // Mark CLARO as active; OSCURO default is is-active via HTML attr, will be fixed by DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', function() {
+          var d = document.getElementById('theme-opt-dark');
+          var l = document.getElementById('theme-opt-light');
+          if (d && l) { d.classList.remove('is-active'); l.classList.add('is-active'); }
+        });
+      }
+    } catch(_) {}
+  </script>
+
+  <!-- Dashboard styles (Now resolving via app.mount("/css", ...)) -->
+  <link rel="stylesheet" href="css/styles.css?v=11"/>
+</head>
+<body>
+
+  <!-- -- HEADER ----------------------------------------------------------- -->
+  <div id="hdr">
+    <div class="logo">
+      <div class="logo-gem"></div>
+      <span class="logo-name">IMERS</span>
+      <span class="logo-sep">Inteligencia Multiagente para Emergencias y Respuesta Sanitaria</span>
+    </div>
+    <div class="nav">
+      <div class="nav-tab active" onclick="setView('map')">Mapa en vivo</div>
+      <div class="nav-tab" onclick="setView('history')">Historial</div>
+      <div class="nav-tab" onclick="setView('predict')">Predicciones</div>
+      <div class="nav-tab" onclick="setView('knowledge')">Documentación</div>
+    </div>
+    <div class="hdr-right">
+      <div class="alert-badge" id="alert-badge" style="display:none">
+        <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+          <path d="M4.5 1L8 7.5H1L4.5 1Z" stroke="#e07060" stroke-width="1.2"/>
+          <line x1="4.5" y1="3.5" x2="4.5" y2="5.5" stroke="#e07060" stroke-width="1.2" stroke-linecap="round"/>
+          <circle cx="4.5" cy="7" r=".45" fill="#e07060"/>
+        </svg>
+        <span id="crit-count">—</span>
+      </div>
+      <div class="sys-status">
+        <div class="sys-dot" id="sys-dot"></div>
+        <span id="sys-label">CONECTANDO</span>
+      </div>
+      <!-- Theme toggle -->
+      <div class="theme-switch" id="theme-toggle" title="Cambiar tema">
+        <button class="theme-opt theme-opt-dark  is-active" id="theme-opt-dark"  onclick="toggleTheme()">OSCURO</button>
+        <button class="theme-opt theme-opt-light"            id="theme-opt-light" onclick="toggleTheme()">CLARO</button>
+      </div>
+      <div class="clock" id="clock">--:--:--</div>
+    </div>
+  </div>
+
+  <!-- -- KPI STRIP -------------------------------------------------------- -->
+  <!-- All values start as — and are populated by data.js on load -->
+  <div id="kpi">
+    <div class="kpi-cell">
+      <div><div class="kpi-lbl">Activos ahora</div><div class="kpi-val" id="kv-active">—</div></div>
+    </div>
+    <div class="kpi-cell">
+      <div><div class="kpi-lbl">Hoy total</div><div class="kpi-val" id="kv-today">—</div></div>
+    </div>
+    <div class="kpi-cell">
+      <div><div class="kpi-lbl">T. respuesta medio</div><div class="kpi-val" id="kv-rt">—<span> min</span></div></div>
+    </div>
+    <div class="kpi-cell">
+      <div><div class="kpi-lbl">Unidades disp.</div><div class="kpi-val" id="kv-units">—</div></div>
+    </div>
+  </div>
+
+  <!-- -- MAIN ------------------------------------------------------------- -->
+  <div id="main">
+
+    <!-- SCREEN 1: LIVE MAP -->
+    <div id="screen-map" class="screen active">
+      <div id="map-sidebar">
+        <div class="sidebar-hdr">
+          <span class="sidebar-hdr-title">Incidentes activos</span>
+          <span class="sidebar-hdr-count" id="inc-count">—</span>
+        </div>
+        <div class="filter-bar">
+          <button class="filter-btn active" onclick="filterInc('all',this)">Todos</button>
+          <button class="filter-btn" onclick="filterInc('critical',this)">Crít.</button>
+          <button class="filter-btn" onclick="filterInc('high',this)">Alto</button>
+          <button class="filter-btn" onclick="filterInc('medium',this)">Med.</button>
+          <button class="filter-btn" onclick="filterInc('low',this)">Bajo</button>
+        </div>
+        <div id="inc-list"></div>
+      </div>
+
+      <div id="map-area">
+        <div id="detail-panel">
+          <div class="det-hdr">
+            <span class="sidebar-hdr-title" id="det-id">—</span>
+            <button class="close-btn" onclick="closeDetail()">✕</button>
+          </div>
+          <div class="det-body" id="det-body"></div>
+        </div>
+        <div id="map-el"></div>
+        <div class="map-legend">
+          <div class="leg-row"><div class="leg-dot" style="background:var(--red)"></div>Crítico</div>
+          <div class="leg-row"><div class="leg-dot" style="background:var(--amber)"></div>Alto</div>
+          <div class="leg-row"><div class="leg-dot" style="background:var(--blue)"></div>Medio</div>
+          <div class="leg-row"><div class="leg-dot" style="background:var(--teal)"></div>Bajo</div>
+          <div class="leg-divider"></div>
+          <div class="leg-row"><div class="leg-line" style="background:var(--red)"></div>Zona caliente</div>
+        </div>
+        <div class="map-badge map-badge-bl" id="map-coords">—</div>
+        <div class="map-badge map-badge-tr">
+          <div class="live-dot"></div>MODO EN VIVO
+        </div>
+
+      </div>
+
+      <div id="map-right">
+        <!-- CALL PANEL -->
+        <div class="rp-sec rp-sec-border">
+          <div class="rp-lbl">Despacho</div>
+          <div id="call-panel">
+            <div class="call-row">
+              <button id="call-answer-btn" class="call-btn call-btn-primary">Responder</button>
+              <button id="call-simulate-btn" class="call-btn">Simular</button>
+            </div>
+            <div id="call-state" class="call-state">Estado: inactivo</div>
+            <div id="call-session" class="call-session">Sesion: —</div>
+            <div id="call-transcript" class="call-transcript">Transcripcion en vivo...</div>
+          </div>
+        </div>
+
+        <!-- QUEUE PANEL -->
+        <div class="rp-sec rp-sec-queue">
+          <div class="rp-lbl">
+            Cola de llamadas
+            <span class="queue-count-badge" id="queue-count">0</span>
+          </div>
+          <div id="queue-panel">
+            <!-- Queued items list -->
+            <div id="queue-list"><div class="queue-empty">Cola vacía</div></div>
+
+            <!-- Upload drop zone -->
+            <div id="queue-drop-zone" class="upload-drop-zone" title="Arrastra un audio o haz clic">
+              <div class="udz-icon">↳</div>
+              <div class="udz-label">Subir grabación</div>
+              <div class="udz-hint">WAV · MP3 · MP4 · M4A · OGG</div>
+            </div>
+            <input id="queue-file-input" type="file" accept=".wav,.mp3,.mp4,.m4a,.ogg,.flac" style="display:none">
+
+            <!-- Upload progress -->
+            <div id="queue-upload-wrap" class="upload-progress-wrap" style="display:none">
+              <div class="upload-progress-track">
+                <div class="upload-progress-fill" id="queue-upload-bar" style="width:0%"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Severity bars: populated by renderSeverityBars() in map.js -->
+        <div class="rp-sec">
+          <div class="rp-lbl">Por severidad</div>
+          <div id="sev-bars"></div>
+        </div>
+        <!-- Type breakdown: populated by renderTypeBars() in map.js -->
+        <div class="rp-sec">
+          <div class="rp-lbl">Tipos · hoy</div>
+          <div id="type-bars"></div>
+        </div>
+        <!-- Hotspot mini-list: populated by renderHsMini() in map.js -->
+        <div class="rp-sec rp-sec-grow">
+          <div class="rp-lbl">Zonas calientes</div>
+          <div id="hs-list-mini"></div>
+        </div>
+
+      </div><!-- /map-right -->
+    </div>
+
+    <!-- SCREEN 2: HISTORY -->
+    <div id="screen-history" class="screen">
+      <div class="view-toolbar">
+        <div class="view-title-row">
+          <div class="view-title">Historial de incidentes</div>
+          <div class="view-badge" id="hist-count-badge">— REGISTROS</div>
+        </div>
+        <div class="toolbar-controls">
+          <input id="hist-search" class="search-input"
+            placeholder="Buscar por ID, tipo, ubicación, severidad..."
+            oninput="histPage=1;renderHistory()"/>
+          <div class="filter-row">
+            <button class="fr-btn active" onclick="setHistFilter('sev','all',this)">Todos</button>
+            <button class="fr-btn" onclick="setHistFilter('sev','critical',this)">Crít.</button>
+            <button class="fr-btn" onclick="setHistFilter('sev','high',this)">Alto</button>
+            <button class="fr-btn" onclick="setHistFilter('sev','medium',this)">Med.</button>
+            <button class="fr-btn" onclick="setHistFilter('sev','low',this)">Bajo</button>
+          </div>
+          <div class="filter-row">
+            <button class="fr-btn active" onclick="setHistFilter('status','all',this)">Todos</button>
+            <button class="fr-btn" onclick="setHistFilter('status','resolved',this)">Resueltos</button>
+            <button class="fr-btn" onclick="setHistFilter('status','active',this)">Activos</button>
+          </div>
+        </div>
+      </div>
+      <div class="hist-table-wrap">
+        <table class="hist-table">
+          <thead>
+            <tr>
+              <th onclick="sortHist('id')" data-sort-key="id">ID</th>
+              <th onclick="sortHist('ts')" data-sort-key="ts">Fecha</th>
+              <th>Tipo</th>
+              <th onclick="sortHist('sev')" data-sort-key="sev">Gravedad</th>
+              <th>Ubicación</th>
+              <th onclick="sortHist('units')" data-sort-key="units">Unidades</th>
+              <th onclick="sortHist('rt')" data-sort-key="rt">T.resp.</th>
+              <th onclick="sortHist('conf')" data-sort-key="conf">Conf.</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="hist-tbody"></tbody>
+        </table>
+      </div>
+      <div id="hist-pagination" class="hist-pagination"></div>
+      <div id="hist-modal">
+        <div class="hm-box">
+          <div class="hm-hdr">
+            <span class="hm-id" id="hm-id">—</span>
+            <button class="close-btn" onclick="closeHistModal()">✕</button>
+          </div>
+          <div class="hm-body" id="hm-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: PREDICTIONS -->
+    <div id="screen-predict" class="screen">
+      <div class="view-toolbar">
+        <div class="view-title-row">
+          <div class="view-title">Predicciones y zonas de riesgo</div>
+        </div>
+        <div class="pred-meta-row">
+          <span id="pred-updated" class="pred-updated-lbl">—</span>
+          <button id="pred-refresh-btn" class="fr-btn" onclick="refreshPredictions()">↻ Actualizar</button>
+        </div>
+      </div>
+      <div class="predict-body">
+        <div class="pred-grid">
+          <div class="pred-block">
+            <div class="pred-block-title">Predicción 7 días · incidentes estimados</div>
+            <div class="forecast-bars" id="fc-bars"></div>
+            <div id="fc-labels" class="fc-labels"></div>
+          </div>
+          <div class="pred-block">
+            <div class="pred-block-title">Distribución horaria · promedio 30 días</div>
+            <div id="hourly-meta" class="pred-hourly-meta"></div>
+            <div class="hourly-bars" id="hourly-bars"></div>
+            <div id="hourly-labels" class="hourly-labels"></div>
+          </div>
+          <div class="pred-block pred-block-full">
+            <div class="pred-block-title">Zonas de alta incidencia · ranking de riesgo</div>
+            <div id="hs-ranking"></div>
+          </div>
+          <div class="pred-block">
+            <div class="pred-block-title">Incidentes por tipo · últimos 30 días</div>
+            <div id="type-trend"></div>
+          </div>
+          <div class="pred-block">
+            <div class="pred-block-title">Tiempo de respuesta por severidad</div>
+            <div id="rt-chart"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: KNOWLEDGE BASE -->
+    <div id="screen-knowledge" class="screen">
+      <div id="kb-list-col">
+        <div class="view-toolbar">
+          <div class="view-title-row">
+            <div class="view-title">Base de conocimiento</div>
+          </div>
+          <div class="filter-row" id="kb-mode-bar" style="margin-bottom:8px">
+            <button class="fr-btn active" onclick="setKBMode('adapted',this)">Protocolos adaptados <span class="kb-mode-count" id="kb-count-adapted"></span></button>
+            <button class="fr-btn" onclick="setKBMode('raw',this)">Documentos originales <span class="kb-mode-count" id="kb-count-raw"></span></button>
+          </div>
+          <div class="toolbar-controls">
+            <input id="kb-search" class="search-input"
+              placeholder="Búsqueda semántica RAG: protocolos, procedimientos, terminología..."
+              oninput="handleKBSearch()"/>
+            <div id="kb-adapted-filters">
+              <div class="filter-row">
+                <button class="fr-btn active" onclick="setKBCat('TODOS',this)">Todos</button>
+                <button class="fr-btn" onclick="setKBCat('SANITARIO',this)">Sanitario</button>
+                <button class="fr-btn" onclick="setKBCat('TRÁFICO',this)">Tráfico</button>
+                <button class="fr-btn" onclick="setKBCat('BOMBEROS',this)">Bomberos</button>
+                <button class="fr-btn" onclick="setKBCat('RIESGO',this)">Riesgo</button>
+              </div>
+              <select id="kb-incident-filter" class="search-input" style="max-width:210px" onchange="renderKB()">
+                <option value="all">Incidente: todos</option>
+                <option value="cardiac_arrest">Parada cardiorrespiratoria</option>
+                <option value="traffic_accident">Accidente de tráfico</option>
+                <option value="fire">Incendio</option>
+                <option value="gas_leak">Fuga de gas</option>
+                <option value="assault">Agresión</option>
+                <option value="fall_injury">Caída / trauma</option>
+                <option value="stroke">Ictus</option>
+                <option value="other">Otro</option>
+              </select>
+              <select id="kb-urgency-filter" class="search-input" style="max-width:170px" onchange="renderKB()">
+                <option value="all">Urgencia: todas</option>
+                <option value="critical">Crítico</option>
+                <option value="high">Alto</option>
+                <option value="medium">Medio</option>
+                <option value="low">Bajo</option>
+              </select>
+            </div>
+          </div>
+        </div>
+<div id="kb-search-results" class="kb-search-results-panel" style="display:none"></div>
+        <div id="kb-cards" class="kb-cards-scroll"></div>
+        <div id="kb-raw-list" class="kb-cards-scroll" style="display:none"></div>
+      </div>
+      <div id="kb-article-col" class="hidden">
+        <div class="kb-art-hdr">
+          <span class="sidebar-hdr-title" id="kb-art-code">—</span>
+          <button class="close-btn" onclick="closeArticle()">✕</button>
+        </div>
+<div class="kb-art-body" id="kb-art-body"></div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+
+  <!-- -- DISPATCH MODAL --------------------------------------------------- -->
+  <div id="dispatch-modal" style="display:none; position: absolute; inset: 0; background: rgba(0,0,0,.72); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+    <div class="hm-box" style="width: 720px; max-height: 85vh;">
+      <div class="hm-hdr">
+        <span class="hm-id">NUEVA LLAMADA — TRANSCRIPCIÓN EN VIVO</span>
+        <button class="close-btn" onclick="closeDispatchModal()">✕</button>
+      </div>
+      <div class="hm-body" style="display: flex; flex-direction: column; gap: 15px;">
+        
+        <!-- Live Transcript -->
+        <div class="rp-sec" style="border: 1px solid var(--ln2); padding: 10px; background: var(--bg0);">
+          <div class="rp-lbl">Transcripción de la llamada</div>
+          <div id="dm-transcript" style="font-family: var(--mono); font-size: 10px; color: var(--t2); min-height: 80px; max-height: 150px; overflow-y: auto;">
+            Esperando audio...
+          </div>
+        </div>
+
+        <!-- Extracted Details (Editable) -->
+        <div class="rp-sec" style="border: 1px solid var(--ln2); padding: 10px; background: var(--bg0);">
+           <div class="rp-lbl">Detalles del Incidente</div>
+           <div class="dm-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+             <!-- Row 1: TIPO | SEVERIDAD -->
+             <div class="input-group">
+               <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">TIPO</label>
+               <input type="text" id="dm-type" class="search-input" style="width:100%" />
+             </div>
+             <div class="input-group">
+               <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">SEVERIDAD</label>
+               <select id="dm-sev" class="search-input" style="width:100%">
+                  <option value="critical">Crítico</option>
+                  <option value="high">Alto</option>
+                  <option value="medium">Medio</option>
+                  <option value="low">Bajo</option>
+               </select>
+             </div>
+             <!-- Row 2: UBICACIÓN | ETA -->
+             <div class="input-group">
+               <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">UBICACIÓN (RUTA)</label>
+               <input type="text" id="dm-addr" class="search-input" style="width:100%"
+                      title="Escriba la dirección y pulse Enter para re-geocodificar" />
+               <a id="dm-maps-link" href="#" target="_blank" rel="noopener noreferrer"
+                  style="display:none; font-family:var(--mono); font-size:9px; color:var(--acc); margin-top:4px; text-decoration:none; cursor:pointer;">
+                 🗺 Abrir en Google Maps →
+               </a>
+             </div>
+             <div class="input-group">
+               <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">TIEMPO DE RESPUESTA (min)</label>
+               <input type="number" id="dm-rt" class="search-input" style="width:100%" />
+             </div>
+             <!-- Row 3: UNIDADES (full-width) -->
+             <div class="input-group" style="grid-column: 1 / -1;">
+               <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">UNIDADES DESPACHADAS</label>
+               <textarea id="dm-units" class="search-input" rows="4"
+                         style="width:100%; resize:vertical; font-family:var(--mono); font-size:11px; line-height:1.7;"></textarea>
+             </div>
+             <!-- Row 4: PROTOCOLO (full-width) -->
+             <div class="input-group" style="grid-column: 1 / -1;">
+               <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">PROTOCOLO</label>
+               <textarea id="dm-protocol" class="search-input" rows="5"
+                         style="width:100%; resize:vertical; font-family:var(--mono); font-size:10px; line-height:1.5;"></textarea>
+             </div>
+           </div>
+        </div>
+
+        <div id="dispatch-mini-map" style="height:180px; width:100%; margin-bottom:10px;"></div>
+        <!-- Actions -->
+        <div id="dm-action-bar" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 5px; align-items: center; flex-wrap: wrap;">
+          <button class="call-btn dm-discard-btn" style="flex:none; padding:0 15px;" onclick="discardCase()">Descartar caso</button>
+          <button class="call-btn" style="flex:none; padding:0 15px;" onclick="closeDispatchModal()">Cerrar caso</button>
+          <button id="dm-hangup-btn" class="call-btn" style="flex:none; padding:0 15px;" onclick="hangUpCall()">Colgar Llamada</button>
+
+          <!-- State A: awaiting dispatch -->
+          <button id="dm-dispatch-btn" class="call-btn call-btn-primary" style="flex:none; padding:0 15px; font-weight:bold" onclick="sendDispatchModal()">Enviar Despacho</button>
+
+          <!-- State B: dispatch sent — countdown + arrival confirmation -->
+          <div id="dm-arrival-zone" style="display:none; align-items:center; gap:10px;">
+            <div id="dm-countdown" class="dm-countdown">⏱ --:--</div>
+            <button id="dm-arrive-btn" class="call-btn dm-arrive-btn" onclick="confirmDispatchArrival()">✓ Confirmar llegada · Cerrar</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- -- TICKER ----------------------------------------------------------- -->
+  <div id="ticker">
+    <div class="ticker-inner" id="ticker-txt"></div>
+  </div>
+
+  <!-- Load order is strict: data → utils → screens → app -->
+  <script src="js/data.js?v=11"></script>
+  <script src="js/utils.js?v=9"></script>
+  <script src="js/map.js?v=9"></script>
+  <script src="js/history.js?v=9"></script>
+  <script src="js/predictions.js?v=9"></script>
+  <script src="js/knowledge.js?v=10"></script>
+  <script src="js/audio_capture.js?v=9"></script>
+  <script src="js/call_queue.js?v=10"></script>
+  <script src="js/dispatch_map.js?v=12"></script>
+  <script src="js/app.js?v=15"></script>
+
+</body>
+</html>
