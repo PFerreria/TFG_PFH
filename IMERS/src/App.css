@@ -1,0 +1,215 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Barlow+Condensed:wght@400;500;600;700&display=swap');
+
+:root {
+  --bg0:     #07090b;
+  --bg1:     #0c0f13;
+  --bg2:     #111518;
+  --ln:      rgba(255,255,255,0.08);
+  --ln2:     rgba(255,255,255,0.20);
+  --amber:   #c97f0a;
+  --amber-d: rgba(201,127,10,0.13);
+  --teal:    #0e7a5e;
+  --red:     #b83030;
+  --t1:      #edf4fc;
+  --t2:      #d6e8f6;
+  --t3:      #c0d6ea;
+  --mono:    'IBM Plex Mono', monospace;
+  --cond:    'Barlow Condensed', sans-serif;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  background: var(--bg0);
+  color: var(--t1);
+  font-family: var(--cond);
+  user-select: none;
+  overflow: hidden;
+}
+
+/* CRT scanline overlay */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent, transparent 3px,
+    rgba(0,0,0,.018) 3px, rgba(0,0,0,.018) 4px
+  );
+  pointer-events: none;
+  z-index: 9998;
+}
+
+#root {
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.splash {
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+/* Card — sharp corners, amber left accent, corner notch */
+.card {
+  background: var(--bg1);
+  border: 1px solid var(--ln2);
+  border-left: 2px solid var(--amber);
+  padding: 40px 48px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: -1px; right: -1px;
+  width: 16px; height: 16px;
+  border-top: 1px solid var(--amber);
+  border-right: 1px solid var(--amber);
+}
+
+/* Logo row — gem + name (mirrors dashboard header) */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-gem {
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--amber);
+  transform: rotate(45deg);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.logo-gem::after {
+  content: '';
+  position: absolute; inset: 3px;
+  background: var(--amber);
+}
+
+.logo-name {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  color: var(--t1);
+}
+
+/* Subtitle */
+.subtitle {
+  font-family: var(--mono);
+  font-size: 7.5px;
+  color: var(--t3);
+  text-align: center;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  line-height: 1.7;
+  border-top: 1px solid var(--ln);
+  padding-top: 14px;
+  width: 100%;
+}
+
+/* Spinner */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.spinner {
+  width: 26px; height: 26px;
+  border: 1.5px solid var(--ln2);
+  border-top-color: var(--amber);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin: 4px 0;
+}
+
+/* Status text */
+.status-text {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .10em;
+  color: var(--t2);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.status-text.error { color: var(--red); }
+
+.elapsed {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--amber);
+  letter-spacing: .08em;
+}
+
+.status-sub {
+  font-family: var(--mono);
+  font-size: 8px;
+  color: var(--t3);
+  text-align: center;
+  line-height: 1.8;
+  letter-spacing: .04em;
+}
+
+.status-sub code {
+  background: var(--bg2);
+  border: 1px solid var(--ln);
+  padding: 1px 5px;
+  font-size: 8px;
+  font-family: var(--mono);
+}
+
+/* Success checkmark — square, teal glow */
+@keyframes pop  { 0%{transform:scale(0);opacity:0} 70%{transform:scale(1.2)} 100%{transform:scale(1);opacity:1} }
+@keyframes glow { 0%,100%{box-shadow:0 0 4px rgba(14,122,94,.5)} 50%{box-shadow:0 0 10px rgba(14,122,94,.9)} }
+
+.checkmark {
+  width: 28px; height: 28px;
+  border: 1.5px solid var(--teal);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--teal);
+  animation: pop 0.4s ease forwards, glow 2.2s ease-in-out 0.4s infinite;
+  margin: 4px 0;
+}
+
+/* Error icon — square, red */
+.error-icon {
+  width: 28px; height: 28px;
+  border: 1.5px solid var(--red);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--red);
+  margin: 4px 0;
+}
+
+/* Retry button */
+.retry-btn {
+  margin-top: 8px;
+  padding: 8px 24px;
+  background: none;
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.retry-btn:hover { background: var(--amber-d); }
