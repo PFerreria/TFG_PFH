@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[codz]
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Testing
+htmlcov/
+.coverage
+.coverage.*
+.cache
+coverage.xml
+*.cover
+*.py.cover
+.pytest_cache/
+
+# Virtual environments
+.env
+.envrc
+.venv
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Project-specific
+.sqlite3
+.bin
+code/IMERS/node_modules
+
+# Databases
+code/data/*.db
+code/data/*.db-wal
+code/data/*.db-shm
+code/data/*.db.bak
+code/data/*.db.bak-wal
+
+# Recordings
+code/data/recordings/uploads/
+
+# Runtime caches
+code/cache/
+
+# Compiled sidecar binaries
+imers-backend.exe
+imers-backend
