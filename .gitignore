@@ -37,20 +37,20 @@ venv.bak/
 # Project-specific
 .sqlite3
 .bin
-code/IMERS/node_modules
+IMERS/node_modules
 
 # Databases
-code/data/*.db
-code/data/*.db-wal
-code/data/*.db-shm
-code/data/*.db.bak
-code/data/*.db.bak-wal
+data/*.db
+data/*.db-wal
+data/*.db-shm
+data/*.db.bak
+data/*.db.bak-wal
 
 # Recordings
-code/data/recordings/uploads/
+data/recordings/uploads/
 
 # Runtime caches
-code/cache/
+cache/
 
 # Compiled sidecar binaries
 imers-backend.exe
