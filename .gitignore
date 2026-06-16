@@ -51,7 +51,11 @@ data/recordings/uploads/
 
 # Runtime caches
 cache/
+.fuse_hidden*
 
 # Compiled sidecar binaries
 imers-backend.exe
 imers-backend
+
+# Test results
+test/e2e_results/
