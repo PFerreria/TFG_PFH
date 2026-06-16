@@ -2032,8 +2032,6 @@ async def _queue_processor() -> None:
                         _active_session = None
                     if fpath:
                         logger.info("[Queue] Recording retained on disk: %s", fpath)
-                    if _queue_event:
-                        _queue_event.set()
                     await ws_manager.broadcast({"type": "session_ended", "session_id": s.session_id})
 
                 async with _queue_lock:
@@ -2178,8 +2176,6 @@ async def start_queue_item(item_id: str):
                 _active_session = None
             if fpath:
                 logger.info("[Queue] Recording retained on disk: %s", fpath)
-            if _queue_event:
-                _queue_event.set()
             await ws_manager.broadcast({"type": "session_ended", "session_id": s.session_id})
 
         async with _queue_lock:

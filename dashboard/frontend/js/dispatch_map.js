@@ -1,4 +1,5 @@
 let dispatchMap = null;
+let dispatchTileLayer = null;
 let dispatchMarker = null;
 let dispatchRoutes = [];
 let currentIncidentCoords = null;
@@ -23,7 +24,7 @@ function initDispatchMap() {
     maxBoundsViscosity: 0.85,
     minZoom: 11,
   }).setView([37.3886, -5.9823], 13);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(dispatchMap);
+  dispatchTileLayer = L.tileLayer(_dispatchTileUrl(), { subdomains: 'abcd', maxZoom: 19 }).addTo(dispatchMap);
   requestAnimationFrame(() => {
     dispatchMap.invalidateSize();
     requestAnimationFrame(() => dispatchMap.invalidateSize());
@@ -394,7 +395,18 @@ function clearDispatchMap() {
   }
 }
 
+function _dispatchTileUrl() {
+  return document.documentElement.getAttribute("data-theme") === "light"
+    ? "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+    : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+}
+
+function updateDispatchMapTileTheme() {
+  if (dispatchTileLayer) dispatchTileLayer.setUrl(_dispatchTileUrl());
+}
+
 window.initDispatchMap = initDispatchMap;
 window.updateDispatchMap = updateDispatchMap;
 window.updateDispatchMapFromInput = updateDispatchMapFromInput;
 window.clearDispatchMap = clearDispatchMap;
+window.updateDispatchMapTileTheme = updateDispatchMapTileTheme;

@@ -837,6 +837,8 @@ function toggleTheme() {
     html.setAttribute("data-theme", "light");
   }
   _syncThemeToggle();
+  if (typeof updateMapTileTheme === "function") updateMapTileTheme();
+  if (typeof updateDispatchMapTileTheme === "function") updateDispatchMapTileTheme();
   try { localStorage.setItem("imers-theme", isLight ? "dark" : "light"); } catch (_) {}
 }
 

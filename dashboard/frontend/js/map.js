@@ -1,4 +1,5 @@
 let leafMap   = null;
+let tileLayer = null;
 let markers   = [];
 let circles   = [];
 let baseMarkers = [];
@@ -31,7 +32,7 @@ function initMap() {
     minZoom: 11,
   }).setView([37.3886, -5.9823], 13);
 
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+  tileLayer = L.tileLayer(_mapTileUrl(), {
     attribution: '&copy; <a href="https://carto.com">CartoDB</a>',
     maxZoom: 19,
     subdomains: "abcd",
@@ -312,3 +313,14 @@ async function confirmArrival(id) {
 }
 
 window.confirmArrival = confirmArrival;
+
+function _mapTileUrl() {
+  return document.documentElement.getAttribute("data-theme") === "light"
+    ? "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+    : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+}
+
+function updateMapTileTheme() {
+  if (tileLayer) tileLayer.setUrl(_mapTileUrl());
+}
+window.updateMapTileTheme = updateMapTileTheme;

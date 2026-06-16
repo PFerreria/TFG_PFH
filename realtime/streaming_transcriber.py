@@ -505,7 +505,7 @@ class StreamingTranscriber:
                         model="whisper-large-v3-turbo",
                         file=buffer,
                         language=_LANG,
-                        prompt=WHISPER_PROMPT,
+                        prompt=WHISPER_PROMPT[:896],
                         response_format="verbose_json"
                     )
                     text = getattr(transcription, "text", "").strip()
@@ -533,7 +533,7 @@ class StreamingTranscriber:
 
                     t0 = time.perf_counter()
                     result = self._hf_client.automatic_speech_recognition(
-                        buffer,
+                        buffer.read(),
                         model="openai/whisper-large-v3"
                     )
                     text = getattr(result, "text", "").strip()

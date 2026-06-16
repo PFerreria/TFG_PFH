@@ -158,7 +158,7 @@ def _route_via_ors(
         steps = segments[0]["steps"] if segments else []
 
         distance_km = summary["distance"]
-        duration_minutes = round((distance_km / speed_kmh) * 60, 1) if speed_kmh > 0 else 0
+        duration_minutes = max(1.0, round((distance_km / speed_kmh) * 60, 1)) if speed_kmh > 0 else 0
 
         instructions = [
             {
@@ -247,7 +247,7 @@ def _route_stub(
     """Fallback: straight-line distance + emergency speed estimate."""
     dist_km = _haversine_km(origin_lat, origin_lon, dest_lat, dest_lon)
     road_km = round(dist_km * 1.3, 2)
-    eta_min = round((road_km / speed_kmh) * 60, 1) if speed_kmh > 0 else 0
+    eta_min = max(1.0, round((road_km / speed_kmh) * 60, 1)) if speed_kmh > 0 else 0
 
     straight_line_coords = [(origin_lat, origin_lon), (dest_lat, dest_lon)]
     polyline = _encode_polyline(straight_line_coords)
