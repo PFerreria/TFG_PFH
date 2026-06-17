@@ -4,31 +4,41 @@ let dispatchMarker = null;
 let dispatchRoutes = [];
 let currentIncidentCoords = null;
 
-const DM_SEVILLA_BOUNDS = L.latLngBounds(
-  [37.25, -6.12],
-  [37.52, -5.82]
-);
+const DM_SEVILLA_BOUNDS = (typeof L !== 'undefined')
+  ? L.latLngBounds([37.25, -6.12], [37.52, -5.82])
+  : null;
 
 function dmInSevillaArea(lat, lon) {
   return lat >= 37.25 && lat <= 37.52 && lon >= -6.12 && lon <= -5.82;
 }
 
 function initDispatchMap() {
+  if (typeof L === 'undefined') return;
   if (dispatchMap) return;
   const container = document.getElementById('dispatch-mini-map');
   if (!container) return;
-  dispatchMap = L.map('dispatch-mini-map', {
+  const mapOptions = {
     zoomControl: false,
     attributionControl: false,
-    maxBounds: DM_SEVILLA_BOUNDS,
     maxBoundsViscosity: 0.85,
     minZoom: 11,
-  }).setView([37.3886, -5.9823], 13);
+  };
+  if (DM_SEVILLA_BOUNDS) mapOptions.maxBounds = DM_SEVILLA_BOUNDS;
+  dispatchMap = L.map('dispatch-mini-map', mapOptions).setView([37.3886, -5.9823], 13);
   dispatchTileLayer = L.tileLayer(_dispatchTileUrl(), { subdomains: 'abcd', maxZoom: 19 }).addTo(dispatchMap);
   requestAnimationFrame(() => {
-    dispatchMap.invalidateSize();
-    requestAnimationFrame(() => dispatchMap.invalidateSize());
+    if (dispatchMap) {
+      dispatchMap.invalidateSize();
+      requestAnimationFrame(() => { if (dispatchMap) dispatchMap.invalidateSize(); });
+    }
   });
+}
+
+function refreshDispatchMapSize() {
+  if (dispatchMap) {
+    dispatchMap.invalidateSize();
+    setTimeout(() => { if (dispatchMap) dispatchMap.invalidateSize(); }, 150);
+  }
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -406,6 +416,7 @@ function updateDispatchMapTileTheme() {
 }
 
 window.initDispatchMap = initDispatchMap;
+window.refreshDispatchMapSize = refreshDispatchMapSize;
 window.updateDispatchMap = updateDispatchMap;
 window.updateDispatchMapFromInput = updateDispatchMapFromInput;
 window.clearDispatchMap = clearDispatchMap;

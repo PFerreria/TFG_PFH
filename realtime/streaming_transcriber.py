@@ -669,6 +669,9 @@ class StreamingTranscriber:
 
     def _check_early_trigger(self) -> None:
         """Fire on_early_trigger if transcript has both a location and an incident keyword."""
+        if self._early_fired:
+            return
+
         with self._lock:
             words = self._transcript.split()
             transcript_lower = self._transcript.lower()

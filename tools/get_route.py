@@ -52,7 +52,7 @@ UNIT_BASES = {
     "rescue": ["Parque Central San Bernardo", "Parque Triana Los Remedios", "Parque Polígono Sur"],
 }
 
-_BASE_COORDS_CACHE = {
+_BASE_COORDS_CACHE: dict[str, tuple[float, float]] = {
     "Base 061 Cartuja":               (37.4102, -6.0049),
     "Hospital Virgen del Rocío":      (37.3582, -5.9794),
     "Hospital Virgen Macarena":       (37.4093, -5.9877),
@@ -62,14 +62,15 @@ _BASE_COORDS_CACHE = {
     "Distrito Macarena":              (37.4115, -5.9815),
     "Distrito Triana":                (37.3855, -6.0121),
     "Distrito Este":                  (37.4042, -5.9221),
-    "Parque Central San Bernardo":    (37.3842, -5.9819), 
+    "Parque Central San Bernardo":    (37.3842, -5.9819),
     "Parque Carretera de Carmona":    (37.3995, -5.9688),
     "Parque Triana Los Remedios":     (37.3718, -6.0054),
     "Parque Polígono Sur":            (37.3804, -5.9492),
 }
 
 def _geocode_address(address: str) -> Optional[tuple[float, float]]:
-    """Returns (lat, lon) for an address string using Nominatim. Returns None on failure."""
+    """Returns (lat, lon) for an address string. Bases are resolved from the
+    hardcoded cache instantly; other addresses fall back to Nominatim."""
     if address in _BASE_COORDS_CACHE:
         return _BASE_COORDS_CACHE[address]
 
@@ -82,7 +83,9 @@ def _geocode_address(address: str) -> Optional[tuple[float, float]]:
         time.sleep(1)
         loc = geolocator.geocode(f"{address}, Sevilla, España", timeout=10)
         if loc:
-            return (loc.latitude, loc.longitude)
+            result = (loc.latitude, loc.longitude)
+            _BASE_COORDS_CACHE[address] = result
+            return result
     except GeocoderTimedOut:
         pass
     return None

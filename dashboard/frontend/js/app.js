@@ -450,9 +450,15 @@ function openDispatchModal() {
     dmAddrInput.dataset.listenerAttached = "true";
   }
 
+  const dmFormScroll = document.getElementById('dm-form-scroll');
+  if (dmFormScroll) dmFormScroll.scrollTop = 0;
+
   if (typeof window.initDispatchMap === 'function') {
     window.initDispatchMap();
   }
+  setTimeout(() => {
+    if (typeof window.refreshDispatchMapSize === 'function') window.refreshDispatchMapSize();
+  }, 200);
 
   const _aiReady = !!pendingDispatchReport;
   const _placeholder = _aiReady ? "" : "Procesando IA...";

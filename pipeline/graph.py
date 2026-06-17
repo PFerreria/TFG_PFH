@@ -141,15 +141,31 @@ def nlp_node(state: IMERSState, agents: dict) -> IMERSState:
     from tools.extract_location  import extract_location
 
     city = state.get("city_hint", "Sevilla, España")
+    pool = concurrent.futures.ThreadPoolExecutor(max_workers=2)
     try:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
-            f_classify = pool.submit(classify_incident, transcript)
-            f_location = pool.submit(extract_location, transcript, city)
+        f_classify = pool.submit(classify_incident, transcript)
+        f_location = pool.submit(extract_location, transcript, city)
+
+        try:
             classify_raw = f_classify.result(timeout=30)
-            location_raw = f_location.result(timeout=30)
-    except Exception as e:
-        classify_raw = classify_incident(transcript)
-        location_raw = extract_location(transcript, city)
+        except Exception:
+            classify_raw = classify_incident(transcript)
+
+        try:
+            location_raw = f_location.result(timeout=45)
+        except Exception as e:
+            logger.warning(f"[nlp_node] extract_location timed out ({e}) — proceeding with low-confidence result")
+            location_raw = json.dumps({
+                "found": False,
+                "candidates": [],
+                "confidence": "low",
+                "is_midpoint": False,
+                "fuzzy_matched": False,
+                "error": "Location extraction timed out",
+            })
+    finally:
+        # Never wait for stuck threads — background threads will finish on their own.
+        pool.shutdown(wait=False)
 
     classification = json.loads(classify_raw)
     location       = json.loads(location_raw)
@@ -226,8 +242,23 @@ def geo_retry_node(state: IMERSState, agents: dict) -> IMERSState:
     city       = state.get("city_hint", "Sevilla, España")
     candidates = state.get("location_candidates") or []
 
-    retry_text = " ".join(candidates) if candidates else transcript
-    result = json.loads(extract_location(retry_text, city))
+    # If nlp_node produced no candidates, retrying with the same transcript is
+    # pointless — spaCy+Nominatim already failed or timed out on it.
+    if not candidates:
+        logger.warning("[geo_retry_node] No candidates from nlp_node — skipping redundant retry")
+        result = {"found": False}
+    else:
+        retry_text = " ".join(candidates)
+        pool = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+        try:
+            f = pool.submit(extract_location, retry_text, city)
+            try:
+                result = json.loads(f.result(timeout=45))
+            except Exception as e:
+                logger.warning(f"[geo_retry_node] extract_location timed out ({e})")
+                result = {"found": False}
+        finally:
+            pool.shutdown(wait=False)
 
     if not result.get("found"):
         logger.warning("[geo_retry_node] Geocoding retry failed — operator must clarify address")
@@ -282,14 +313,27 @@ def fan_out_node(state: IMERSState, agents: dict) -> IMERSState:
         _preview_ctx.active = False
 
     def _geo_fallback(reason: str) -> dict:
-        """Return a geo result using direct tool calls."""
-        res = geo_agent._fallback(transcript, _pre_units, city, reason)
-        if not res.get("routes"):
+        """Return a geo result using state location — avoids re-calling extract_location
+        which can hang for 90 s when geocoding is unavailable."""
+        dest_lat = state.get("location_lat") or None
+        dest_lon = state.get("location_lon") or None
+        dest_addr = (state.get("location_address") or address) if address != "Unknown" else None
+        res = {
+            "location_resolved": dest_lat is not None,
+            "incident_address":  dest_addr or "Dirección no localizada, operador aclare dirección",
+            "incident_lat":      dest_lat,
+            "incident_lon":      dest_lon,
+            "location_confidence": state.get("location_confidence", "low"),
+            "routes":  [],
+            "map_url": None,
+            "warnings": [f"Geo agent used direct fallback: {reason}"],
+        }
+        if dest_lat and dest_lon and _pre_units:
             res["routes"] = geo_agent._compute_routes_parallel(
                 units=_pre_units,
-                destination_address=res.get("incident_address") or address,
-                dest_lat=res.get("incident_lat") or lat,
-                dest_lon=res.get("incident_lon") or lon,
+                destination_address=res["incident_address"],
+                dest_lat=dest_lat,
+                dest_lon=dest_lon,
             )
         return res
 
@@ -384,36 +428,42 @@ def fan_out_node(state: IMERSState, agents: dict) -> IMERSState:
                 known_is_midpoint=state.get("location_is_midpoint", False),
             )
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
+        pool = concurrent.futures.ThreadPoolExecutor(max_workers=3)
+        try:
             f_proc = pool.submit(_run_procedure)
             f_disp = pool.submit(_run_dispatch)
             f_geo  = pool.submit(_run_geo)
 
-            def _collect(future, name: str, fallback_fn):
-                try:
-                    return future.result(timeout=agent_timeout)
-                except concurrent.futures.TimeoutError:
-                    logger.warning(
-                        f"[fan_out_node] {name} exceeded {agent_timeout}s — using fallback"
-                    )
-                    future.cancel()
+            fallbacks = {
+                f_proc: ("procedure_agent", lambda: procedure_agent._fallback(incident_type, severity, "timeout")),
+                f_disp: ("dispatch_agent",  lambda: dispatch_agent._fallback(incident_type, severity, address, victims, "timeout", lat, lon)),
+                f_geo:  ("geo_agent",       lambda: _geo_fallback("timeout")),
+            }
+
+            # Wait for all 3 agents in parallel so timeouts don't stack (3×120s → 1×120s).
+            done, not_done = concurrent.futures.wait(
+                [f_proc, f_disp, f_geo], timeout=agent_timeout
+            )
+            for f in not_done:
+                name, _ = fallbacks[f]
+                logger.warning(f"[fan_out_node] {name} exceeded {agent_timeout}s — using fallback")
+                f.cancel()
+
+            def _resolve(future) -> any:
+                name, fallback_fn = fallbacks[future]
+                if future in not_done:
                     return fallback_fn()
+                try:
+                    return future.result()
                 except Exception as exc:
                     logger.error(f"[fan_out_node] {name} raised: {exc}")
                     return fallback_fn()
 
-            procedure_res = _collect(
-                f_proc, "procedure_agent",
-                lambda: procedure_agent._fallback(incident_type, severity, "timeout"),
-            )
-            dispatch_res = _collect(
-                f_disp, "dispatch_agent",
-                lambda: dispatch_agent._fallback(incident_type, severity, address, victims, "timeout", lat, lon),
-            )
-            geo_res = _collect(
-                f_geo, "geo_agent",
-                lambda: _geo_fallback("timeout"),
-            )
+            procedure_res = _resolve(f_proc)
+            dispatch_res  = _resolve(f_disp)
+            geo_res       = _resolve(f_geo)
+        finally:
+            pool.shutdown(wait=False)
 
     elapsed = time.perf_counter() - t0
     logger.info(

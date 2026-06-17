@@ -303,6 +303,52 @@ def _reseed_active_incidents() -> None:
         logger.warning("[DB] Could not re-seed active incidents: %s", exc)
 
 
+def _gazetteer_coords(address: str):
+    """Look up an address in the local Sevilla street gazetteer.
+    Returns (lat, lon) if the street is found within Sevilla bounds, else None.
+    No network calls — pure local file lookup.
+    """
+    try:
+        from tools.street_gazetteer import match_street, street_center
+        hit = match_street(address, score_cutoff=80.0)
+        if hit:
+            official_name, _number, _score = hit
+            coords = street_center(official_name)
+            if coords:
+                lat, lon = coords
+                if (37.25 <= lat <= 37.52) and (-6.12 <= lon <= -5.82):
+                    return lat, lon
+    except Exception:
+        pass
+    return None
+
+
+def _fix_incident_coords_from_gazetteer() -> None:
+    """One-time pass at startup: update every stored incident's lat/lon using the
+    local gazetteer so coordinates match the stored address. Zero network calls."""
+    try:
+        incidents = _db_get_incidents()
+        updated = 0
+        _default = "Av. de la Constitución, Sevilla"
+        for inc in incidents:
+            address = inc.get("address", "")
+            if not address or address == _default:
+                continue
+            coords = _gazetteer_coords(address)
+            if coords:
+                inc["latitude"]  = round(coords[0], 6)
+                inc["longitude"] = round(coords[1], 6)
+                with _db_write_lock, _db_conn() as conn:
+                    conn.execute(
+                        "UPDATE incidents SET data=? WHERE id=?",
+                        (json.dumps(inc), inc["id"]),
+                    )
+                updated += 1
+        logger.info("[Gazetteer] Updated coordinates for %d incidents.", updated)
+    except Exception as e:
+        logger.warning("[Gazetteer] Incident coord fix failed: %s", e)
+
+
 @app.on_event("startup")
 async def startup():
     global _pipeline, _analysis_runner, _session_manager, _dashboard_cache
@@ -317,6 +363,7 @@ async def startup():
     _resolve_stale_active_incidents()
     _restore_dispatch_state()
     asyncio.create_task(_wal_checkpoint_loop())
+    _fix_incident_coords_from_gazetteer()
 
     if MOCK_MODE:
         logger.warning("[API] MOCK_MODE=1 — real pipeline disabled. Set IMERS_MOCK_MODE=0 to use Qwen.")
@@ -2358,6 +2405,7 @@ async def ws_audio(ws: WebSocket):
     await ws.send_json({"type": "session_started", "session_id": session.session_id})
     logger.info(f"[WS] Audio session {session.session_id} started")
 
+    _last_partial = ""
     try:
         while True:
             msg = await ws.receive()
@@ -2365,7 +2413,8 @@ async def ws_audio(ws: WebSocket):
                 session.push_audio(msg["bytes"])
                 if session._transcriber:
                     partial = session._transcriber.current_transcript
-                    if partial:
+                    if partial and partial != _last_partial:
+                        _last_partial = partial
                         await ws.send_json({"type": "transcript_partial", "text": partial})
             elif "text" in msg:
                 try:
@@ -2379,7 +2428,9 @@ async def ws_audio(ws: WebSocket):
                     text = ctrl.get("text", "")
                     if session._transcriber:
                         session._transcriber._transcript = text
+                        session._transcriber._last_speech_ts = time.monotonic()
                         session._transcriber._check_early_trigger()
+                        _last_partial = text
                         await ws.send_json({"type": "transcript_partial", "text": text})
                 elif ctrl.get("type") == "ping":
                     await ws.send_json({"type": "pong"})

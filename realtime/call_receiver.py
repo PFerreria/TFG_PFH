@@ -34,11 +34,17 @@ class _VAD:
     FRAME_BYTES = int(SAMPLE_RATE * FRAME_MS / 1000) * SAMPLE_WIDTH
 
     def __init__(self, aggressiveness: int = 2):
+        self._vad     = None
+        self._backend = "energy"
+        # Skip webrtcvad if explicitly disabled (broken DLL on some systems).
+        if os.getenv("IMERS_USE_WEBRTCVAD", "0") != "1":
+            logger.debug("[VAD] Using energy backend (IMERS_USE_WEBRTCVAD!=1)")
+            return
         try:
             import webrtcvad
             self._vad = webrtcvad.Vad(aggressiveness)
             self._backend = "webrtcvad"
-        except ImportError:
+        except Exception:
             self._vad     = None
             self._backend = "energy"
         logger.debug(f"[VAD] Using {self._backend} backend")

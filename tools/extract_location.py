@@ -390,6 +390,33 @@ def extract_location(transcript: str, city_hint: str = "Sevilla, España") -> st
     candidates = _extract_candidates(transcript)
     result["candidates"] = candidates
 
+    # Gazetteer fast-path: try the local street index before hitting Nominatim.
+    # street_center() is instant (<1 ms) and works even when Nominatim is
+    # unreachable.  On devices where Nominatim times out (10 s × 4 retries =
+    # 40 s), this prevents the 45 s nlp_node timeout from firing before any
+    # location is resolved.  On healthy networks Nominatim runs next and can
+    # upgrade the result to a precise house-number address.
+    for candidate in candidates:
+        hit = match_street(_normalize_address(candidate))
+        if not hit:
+            continue
+        official, number, score = hit
+        center = street_center(official)
+        if not center:
+            continue
+        addr = f"{official}{(' ' + number) if number else ''}, Sevilla, España"
+        result.update({
+            "found":       True,
+            "address":     addr,
+            "latitude":    center[0],
+            "longitude":   center[1],
+            "confidence":  "high" if score >= 100 else "medium",
+            "is_midpoint": not bool(number),
+            "fuzzy_matched": score < 100,
+            "error":       None,
+        })
+        return json.dumps(result, ensure_ascii=False)
+
     for candidate in candidates:
         geo = _geocode(candidate, city_hint=city_hint)
         if geo:

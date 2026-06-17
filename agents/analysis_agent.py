@@ -17,9 +17,8 @@ from smolagents import CodeAgent, tool, Model
 
 logger = logging.getLogger(__name__)
 
-DB_PATH  = Path(os.getenv("INCIDENTS_DB_PATH",  "./data/incidents.db"))
-CSV_PATH = Path(os.getenv("INCIDENTS_CSV_PATH", "./data/incidents.csv"))
-
+DB_PATH  = Path(os.getenv("INCIDENTS_DB_PATH",  "./data/imers.db"))
+CSV_PATH = Path(os.getenv("INCIDENTS_CSV_PATH", "./data/imers.csv"))
 
 def _load_incident_data() -> pd.DataFrame:
     """Loads incidents from SQLite via json_extract() on the data blob, or falls back to CSV."""
@@ -82,7 +81,7 @@ def get_incident_history(
         return json.dumps({"records": [], "total": 0,
                            "date_range": {"start": since.isoformat(), "end": datetime.now(timezone.utc).isoformat()}})
 
-    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
+    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True, format="ISO8601")
     mask = df["timestamp"] >= since
     if incident_type != "all":
         mask &= df["incident_type"] == incident_type
@@ -140,7 +139,7 @@ def get_hotspot_analysis(grid_size_km: float = 0.3) -> str:
         return json.dumps({"hotspots": [], "total_cells_analysed": 0,
                            "note": "Insufficient data for hotspot analysis"})
 
-    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
+    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True, format="ISO8601")
     df = df[df["timestamp"] >= datetime.now(timezone.utc) - timedelta(days=90)]
 
     cell_deg = grid_size_km / 111.0
@@ -223,7 +222,7 @@ def get_trend_forecast(forecast_days: int = 7) -> str:
             "note": f"Need ≥30 records for forecast (have {len(df)})"
         })
 
-    df["timestamp"] = pd.to_datetime(df["timestamp"])
+    df["timestamp"] = pd.to_datetime(df["timestamp"], format="ISO8601")
     df["date"]    = df["timestamp"].dt.date
     df["weekday"] = df["timestamp"].dt.dayofweek
 
@@ -276,7 +275,7 @@ def get_response_time_stats(
         return json.dumps({"overall": {}, "by_severity": {}, "by_incident_type": {},
                            "trend": "unknown", "note": "No response time data"})
 
-    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
+    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True, format="ISO8601")
     since = datetime.now(timezone.utc) - timedelta(days=days_back)
     df    = df[df["timestamp"] >= since].copy()
 
@@ -352,7 +351,7 @@ def get_hourly_distribution(days_back: int = 30) -> str:
             "note": "No data available",
         })
 
-    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True)
+    df["timestamp"] = pd.to_datetime(df["timestamp"], utc=True, format="ISO8601")
     since = datetime.now(timezone.utc) - timedelta(days=days_back)
     df = df[df["timestamp"] >= since].copy()
 

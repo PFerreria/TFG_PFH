@@ -39,7 +39,7 @@ if sys.platform == "win32":
 
 _HERE        = Path(__file__).resolve().parent
 _CODE_DIR    = _HERE.parent
-_RECORDINGS  = _CODE_DIR / "data" / "recordings"
+_RECORDINGS  = _CODE_DIR / "data" / "recordings" / "ai_audios"
 
 if str(_CODE_DIR) not in sys.path:
     sys.path.insert(0, str(_CODE_DIR))

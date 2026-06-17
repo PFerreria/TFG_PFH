@@ -324,73 +324,81 @@
 
   <!-- DISPATCH MODAL -->
   <div id="dispatch-modal" style="display:none; position: absolute; inset: 0; background: rgba(0,0,0,.72); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-    <div class="hm-box" style="width: 720px; max-height: 85vh;">
+    <div class="hm-box" style="width: 720px; max-height: 85vh; overflow: hidden;">
       <div class="hm-hdr">
         <span class="hm-id">NUEVA LLAMADA — TRANSCRIPCIÓN EN VIVO</span>
         <button class="close-btn" onclick="closeDispatchModal()">✕</button>
       </div>
-      <div class="hm-body" style="display: flex; flex-direction: column; gap: 15px;">
-        
-        <div class="rp-sec" style="border: 1px solid var(--ln2); padding: 10px; background: var(--bg0);">
-          <div class="rp-lbl">Transcripción de la llamada</div>
-          <div id="dm-transcript" style="font-family: var(--mono); font-size: 10px; color: var(--t2); min-height: 80px; max-height: 150px; overflow-y: auto;">
-            Esperando audio...
-          </div>
-        </div>
+      <div class="hm-body" style="display: flex; flex-direction: column; min-height: 0; padding: 0; overflow: hidden; gap: 0;">
 
-        <div class="rp-sec" style="border: 1px solid var(--ln2); padding: 10px; background: var(--bg0);">
-           <div class="rp-lbl">Detalles del Incidente</div>
-           <div class="dm-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-             <div class="input-group">
-               <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">TIPO</label>
-               <input type="text" id="dm-type" class="search-input" style="width:100%" />
-             </div>
-             <div class="input-group">
-               <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">SEVERIDAD</label>
-               <select id="dm-sev" class="search-input" style="width:100%">
+        <!-- scrollable form area -->
+        <div id="dm-form-scroll" style="flex: 1; overflow-y: auto; min-height: 0; padding: 15px; display: flex; flex-direction: column; gap: 15px; scrollbar-width: thin;">
+
+          <div class="rp-sec" style="border: 1px solid var(--ln2); padding: 10px; background: var(--bg0);">
+            <div class="rp-lbl">Transcripción de la llamada</div>
+            <div id="dm-transcript" style="font-family: var(--mono); font-size: 10px; color: var(--t2); min-height: 80px; max-height: 150px; overflow-y: auto;">
+              Esperando audio...
+            </div>
+          </div>
+
+          <div class="rp-sec" style="border: 1px solid var(--ln2); padding: 10px; background: var(--bg0);">
+            <div class="rp-lbl">Detalles del Incidente</div>
+            <div class="dm-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="input-group">
+                <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">TIPO</label>
+                <input type="text" id="dm-type" class="search-input" style="width:100%" />
+              </div>
+              <div class="input-group">
+                <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">SEVERIDAD</label>
+                <select id="dm-sev" class="search-input" style="width:100%">
                   <option value="critical">Crítico</option>
                   <option value="high">Alto</option>
                   <option value="medium">Medio</option>
                   <option value="low">Bajo</option>
-               </select>
-             </div>
-             <div class="input-group">
-               <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">UBICACIÓN (RUTA)</label>
-               <input type="text" id="dm-addr" class="search-input" style="width:100%"
-                      title="Escriba la dirección y pulse Enter para re-geocodificar" />
-               <a id="dm-maps-link" href="#" target="_blank" rel="noopener noreferrer"
-                  style="display:none; font-family:var(--mono); font-size:9px; color:var(--acc); margin-top:4px; text-decoration:none; cursor:pointer;">
-                 🗺 Abrir en Google Maps →
-               </a>
-             </div>
-             <div class="input-group">
-               <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">TIEMPO DE RESPUESTA (min)</label>
-               <input type="number" id="dm-rt" class="search-input" style="width:100%" />
-             </div>
-             <div class="input-group" style="grid-column: 1 / -1;">
-               <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">UNIDADES DESPACHADAS</label>
-               <textarea id="dm-units" class="search-input" rows="4"
-                         style="width:100%; resize:vertical; font-family:var(--mono); font-size:11px; line-height:1.7;"></textarea>
-             </div>
-             <div class="input-group" style="grid-column: 1 / -1;">
-               <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">PROTOCOLO</label>
-               <textarea id="dm-protocol" class="search-input" rows="5"
-                         style="width:100%; resize:vertical; font-family:var(--mono); font-size:10px; line-height:1.5;"></textarea>
-             </div>
-           </div>
+                </select>
+              </div>
+              <div class="input-group">
+                <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">UBICACIÓN (RUTA)</label>
+                <input type="text" id="dm-addr" class="search-input" style="width:100%"
+                       title="Escriba la dirección y pulse Enter para re-geocodificar" />
+                <a id="dm-maps-link" href="#" target="_blank" rel="noopener noreferrer"
+                   style="display:none; font-family:var(--mono); font-size:9px; color:var(--acc); margin-top:4px; text-decoration:none; cursor:pointer;">
+                  🗺 Abrir en Google Maps →
+                </a>
+              </div>
+              <div class="input-group">
+                <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">TIEMPO DE RESPUESTA (min)</label>
+                <input type="number" id="dm-rt" class="search-input" style="width:100%" />
+              </div>
+              <div class="input-group" style="grid-column: 1 / -1;">
+                <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">UNIDADES DESPACHADAS</label>
+                <textarea id="dm-units" class="search-input" rows="4"
+                          style="width:100%; resize:vertical; font-family:var(--mono); font-size:11px; line-height:1.7;"></textarea>
+              </div>
+              <div class="input-group" style="grid-column: 1 / -1;">
+                <label style="font-family: var(--mono); font-size:8px; color:var(--t3); display:block; margin-bottom:4px; letter-spacing: .1em;">PROTOCOLO</label>
+                <textarea id="dm-protocol" class="search-input" rows="5"
+                          style="width:100%; resize:vertical; font-family:var(--mono); font-size:10px; line-height:1.5;"></textarea>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <div id="dispatch-mini-map" style="height:180px; width:100%; margin-bottom:10px;"></div>
-        <div id="dm-action-bar" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 5px; align-items: center; flex-wrap: wrap;">
-          <button class="call-btn dm-discard-btn" style="flex:none; padding:0 15px;" onclick="discardCase()">Descartar caso</button>
-          <button class="call-btn" style="flex:none; padding:0 15px;" onclick="closeDispatchModal()">Cerrar caso</button>
-          <button id="dm-hangup-btn" class="call-btn" style="flex:none; padding:0 15px;" onclick="hangUpCall()">Colgar Llamada</button>
+        <!-- pinned bottom: map + action bar always visible -->
+        <div style="flex-shrink: 0; padding: 10px 15px 15px; border-top: 1px solid var(--ln2); display: flex; flex-direction: column; gap: 10px;">
+          <div id="dispatch-mini-map" style="height:180px; width:100%;"></div>
+          <div id="dm-action-bar" style="display: flex; gap: 10px; justify-content: flex-end; align-items: center; flex-wrap: wrap;">
+            <button class="call-btn dm-discard-btn" style="flex:none; padding:0 15px;" onclick="discardCase()">Descartar caso</button>
+            <button class="call-btn" style="flex:none; padding:0 15px;" onclick="closeDispatchModal()">Cerrar caso</button>
+            <button id="dm-hangup-btn" class="call-btn" style="flex:none; padding:0 15px;" onclick="hangUpCall()">Colgar Llamada</button>
 
-          <button id="dm-dispatch-btn" class="call-btn call-btn-primary" style="flex:none; padding:0 15px; font-weight:bold" onclick="sendDispatchModal()">Enviar Despacho</button>
+            <button id="dm-dispatch-btn" class="call-btn call-btn-primary" style="flex:none; padding:0 15px; font-weight:bold" onclick="sendDispatchModal()">Enviar Despacho</button>
 
-          <div id="dm-arrival-zone" style="display:none; align-items:center; gap:10px;">
-            <div id="dm-countdown" class="dm-countdown">⏱ --:--</div>
-            <button id="dm-arrive-btn" class="call-btn dm-arrive-btn" onclick="confirmDispatchArrival()">✓ Confirmar llegada · Cerrar</button>
+            <div id="dm-arrival-zone" style="display:none; align-items:center; gap:10px;">
+              <div id="dm-countdown" class="dm-countdown">⏱ --:--</div>
+              <button id="dm-arrive-btn" class="call-btn dm-arrive-btn" onclick="confirmDispatchArrival()">✓ Confirmar llegada · Cerrar</button>
+            </div>
           </div>
         </div>
 
@@ -412,8 +420,8 @@
   <script src="js/knowledge.js?v=10"></script>
   <script src="js/audio_capture.js?v=9"></script>
   <script src="js/call_queue.js?v=10"></script>
-  <script src="js/dispatch_map.js?v=13"></script>
-  <script src="js/app.js?v=16"></script>
+  <script src="js/dispatch_map.js?v=15"></script>
+  <script src="js/app.js?v=19"></script>
 
 </body>
 </html>
