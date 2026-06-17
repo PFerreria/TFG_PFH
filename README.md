@@ -76,14 +76,9 @@ cd IMERS && npm install
 npm run tauri dev
 ```
 
-**Compilar la aplicación de escritorio**
+**Ejecutable**
 ```
-npm run tauri build
-```
-
-**Ejecutar solo el servidor Vite (sin Tauri)**
-```
-npm run dev
+Se encuentra en /IMERS/src-tauri/binaries
 ```
 
 ---
@@ -238,14 +233,9 @@ cd IMERS && npm install
 npm run tauri dev
 ```
 
-**Build the production desktop app**
+**Executable**
 ```
-npm run tauri build
-```
-
-**Run the Vite dev server only (no Tauri)**
-```
-npm run dev
+Found in /IMERS/src-tauri/binaries
 ```
 
 ---
